@@ -1,4 +1,5 @@
-import random
+import secrets
+import textwrap
 from datetime import datetime, timedelta
 
 from sqlalchemy.orm import Session
@@ -10,10 +11,12 @@ from app.enums.tipo_token import TipoToken
 from fastapi import HTTPException, status
 
 from app.utils.seguranca import criar_access_token
+from app.services.email import enviar_email
 
 
 def gerar_codigo():
-    return str(random.randint(100000, 999999))
+    # secrets é próprio para valores de segurança (random não é)
+    return str(secrets.randbelow(900000) + 100000)
 
 
 def criar_token_2fa(db: Session, usuario: Usuario):
@@ -44,9 +47,11 @@ def criar_token_2fa(db: Session, usuario: Usuario):
     db.add(novo_token)
     db.commit()
 
+    # Se o envio falhar, levanta EmailEnvioError (tratado no login)
     enviar_codigo_2fa(usuario, codigo)
 
     return codigo
+
 
 def verificar_codigo_2fa(
     db: Session,
@@ -61,13 +66,6 @@ def verificar_codigo_2fa(
         )
         .first()
     )
-
-    print("EMAIL RECEBIDO:", email)
-
-    todos = db.query(Usuario).all()
-
-    for u in todos:
-        print("EMAIL BANCO:", u.email)
 
     if not usuario:
         raise HTTPException(
@@ -110,13 +108,12 @@ def verificar_codigo_2fa(
 
     return access_token
 
-from app.services.email import enviar_email
 
 def enviar_codigo_2fa(usuario: Usuario, codigo: str):
 
     assunto = "Código de verificação - VALID"
 
-    mensagem = f"""
+    mensagem = textwrap.dedent(f"""\
         Olá, {usuario.nome}!
 
         Recebemos uma solicitação de login na sua conta da plataforma VALID.
@@ -125,12 +122,12 @@ def enviar_codigo_2fa(usuario: Usuario, codigo: str):
 
         {codigo}
 
-        ⚠ Este código é válido por apenas 10 minutos.
+        Este código é válido por apenas 10 minutos.
 
         Caso você não tenha feito esta solicitação, desconsidere este e-mail.
 
         Equipe VALID
-        """
+        """)
 
     enviar_email(
         destinatario=usuario.email,

@@ -1,16 +1,26 @@
+import os
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm
 
 from app.database import get_db
 from app.schemas.usuario import UsuarioCriacao
-from app.services.autenticacao import criar_usuario
+from app.services.autenticacao import criar_usuario, autenticar_usuario
 
 from app.utils.seguranca import criar_access_token
 
-from app.services.dois_fatores import criar_token_2fa
+from app.services.dois_fatores import criar_token_2fa, verificar_codigo_2fa
+from app.services.email import EmailEnvioError
 from app.schemas.dois_fatores import Verificar2FARequest
-from app.services.dois_fatores import verificar_codigo_2fa
+
+
+# Uso PROVISÓRIO: defina DOIS_FATORES_DESATIVADO=true no ambiente para
+# pular o 2FA (por exemplo, enquanto o envio de e-mail não está configurado).
+# Deixe em false (ou sem definir) para manter o 2FA ativo.
+DOIS_FATORES_DESATIVADO = (
+    os.getenv("DOIS_FATORES_DESATIVADO", "false").strip().lower() == "true"
+)
 
 
 router = APIRouter(
@@ -38,8 +48,6 @@ def cadastro(
         "id_usuario": novo_usuario.id_usuario
     }
 
-from app.schemas.usuario import UsuarioLogin
-from app.services.autenticacao import autenticar_usuario
 
 @router.post("/login")
 def login(
@@ -53,9 +61,20 @@ def login(
     )
 
     # Verifica se o usuário possui 2FA ativo
-    if usuario.dois_fatores_ativo:
+    if usuario.dois_fatores_ativo and not DOIS_FATORES_DESATIVADO:
 
-        criar_token_2fa(db, usuario)
+        try:
+            criar_token_2fa(db, usuario)
+
+        except EmailEnvioError:
+            # Em vez de um erro 500 genérico, devolve uma mensagem clara
+            raise HTTPException(
+                status_code=503,
+                detail=(
+                    "Não foi possível enviar o código de verificação "
+                    "por e-mail. Tente novamente em instantes."
+                )
+            )
 
         return {
             "status": "2fa",
