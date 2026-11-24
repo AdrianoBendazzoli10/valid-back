@@ -41,6 +41,16 @@ class Usuario(Base):
         default=False
     )
 
+    telefone: Mapped[str | None] = mapped_column(
+    String(20),
+    nullable=True
+    )
+
+    foto_url: Mapped[str | None] = mapped_column(
+    String(500),
+    nullable=True
+    )
+
     dois_fatores_ativo: Mapped[bool] = mapped_column(
         Boolean,
         default=False
