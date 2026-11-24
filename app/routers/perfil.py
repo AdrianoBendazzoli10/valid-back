@@ -75,3 +75,5 @@ def teste_google(
         "email": usuario.email,
         "dois_fatores_ativo": usuario.dois_fatores_ativo
     }
+
+    console.log("DADOS DO USUÁRIO:", usuario);
