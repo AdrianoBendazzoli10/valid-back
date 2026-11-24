@@ -38,6 +38,8 @@ def atualizar_perfil(
 
     usuario.nome = dados.nome
     usuario.email = dados.email
+    usuario.telefone = dados.telefone
+    usuario.foto_url = dados.foto_url
 
     db.commit()
     db.refresh(usuario)
@@ -46,7 +48,9 @@ def atualizar_perfil(
         "mensagem": "Perfil atualizado com sucesso!",
         "usuario": {
             "nome": usuario.nome,
-            "email": usuario.email
+            "email": usuario.email,
+            "telefone": usuario.telefone,
+            "foto_url": usuario.foto_url
         }
     }
 

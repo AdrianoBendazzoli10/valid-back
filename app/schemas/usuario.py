@@ -14,6 +14,8 @@ class UsuarioLogin(BaseModel):
 class UsuarioAtualizacao(BaseModel):
     nome: str
     email: EmailStr
+    telefone: str | None = None
+    foto_url: str | None = None
 
 class RedefinirSenha(BaseModel):
     token: str
