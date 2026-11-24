@@ -1,4 +1,4 @@
-from sqlalchemy import String, Boolean, DateTime
+from sqlalchemy import String, Boolean, DateTime, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
@@ -47,9 +47,10 @@ class Usuario(Base):
     )
 
     foto_url: Mapped[str | None] = mapped_column(
-    String(500),
+    Text,
     nullable=True
     )
+
 
     dois_fatores_ativo: Mapped[bool] = mapped_column(
         Boolean,
