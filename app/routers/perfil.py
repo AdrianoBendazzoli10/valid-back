@@ -35,19 +35,23 @@ def atualizar_perfil(
     usuario: Usuario = Depends(obter_usuario_atual),
     db: Session = Depends(get_db)
 ):
-
     usuario.nome = dados.nome
     usuario.email = dados.email
     usuario.telefone = dados.telefone
     usuario.foto_url = dados.foto_url
 
-    print("DADOS RECEBIDOS:", dados.model_dump())
-    print("TELEFONE ANTES DE SALVAR:", usuario.telefone)
-    
+    print("TAMANHO DA FOTO RECEBIDA:",
+          len(dados.foto_url) if dados.foto_url else "VAZIA")
+
+    print("INÍCIO DA FOTO:",
+          dados.foto_url[:50] if dados.foto_url else "VAZIA")
+
     db.commit()
     db.refresh(usuario)
 
-    print("TELEFONE DEPOIS DE SALVAR:", usuario.telefone)
+    print("TAMANHO DA FOTO SALVA:",
+          len(usuario.foto_url) if usuario.foto_url else "VAZIA")
+
     return {
         "mensagem": "Perfil atualizado com sucesso!",
         "usuario": {
@@ -57,7 +61,6 @@ def atualizar_perfil(
             "foto_url": usuario.foto_url
         }
     }
-
 @router.put("/2fa")
 def atualizar_2fa(
     dados: Atualizar2FARequest,
