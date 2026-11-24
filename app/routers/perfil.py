@@ -23,7 +23,10 @@ def visualizar_perfil(
         "id": usuario.id_usuario,
         "nome": usuario.nome,
         "email": usuario.email,
-        "dois_fatores_ativo": usuario.dois_fatores_ativo
+        "telefone": usuario.telefone,
+        "foto_url": usuario.foto_url,
+        "dataCadastro": usuario.data_cadastro,
+        "dois_fatores_ativo": usuario.dois_fatores_ativo 
     }
 
 @router.put("/")
