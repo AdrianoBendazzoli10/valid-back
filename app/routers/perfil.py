@@ -41,9 +41,13 @@ def atualizar_perfil(
     usuario.telefone = dados.telefone
     usuario.foto_url = dados.foto_url
 
+    print("DADOS RECEBIDOS:", dados.model_dump())
+    print("TELEFONE ANTES DE SALVAR:", usuario.telefone)
+    
     db.commit()
     db.refresh(usuario)
 
+    print("TELEFONE DEPOIS DE SALVAR:", usuario.telefone)
     return {
         "mensagem": "Perfil atualizado com sucesso!",
         "usuario": {
