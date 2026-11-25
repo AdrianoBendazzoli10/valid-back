@@ -1,6 +1,7 @@
 from sqlalchemy import String, Boolean, DateTime, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
+from sqlalchemy.dialects.mysql import MEDIUMTEXT
 
 from app.database import Base
 
@@ -47,9 +48,9 @@ class Usuario(Base):
     )
 
     foto_url: Mapped[str | None] = mapped_column(
-    Text,
+    MEDIUMTEXT,
     nullable=True
-    )
+)
 
 
     dois_fatores_ativo: Mapped[bool] = mapped_column(
